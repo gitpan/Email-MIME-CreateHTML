@@ -2,16 +2,17 @@
 # Purpose : Pick the most appropriate resolver
 # Author  : John Alden
 # Created : Aug 2006
-# CVS     : $Header: /home/cvs/software/cvsroot/email/lib/Email/MIME/CreateHTML/Resolver.pm,v 1.5 2006/08/24 21:41:38 johna Exp $
 ###############################################################################
 
 package Email::MIME::CreateHTML::Resolver;
 
 use strict;
 use Carp;
+use Scalar::Util ();
 
-use vars qw($VERSION $HaveCache $HaveLWP $HaveFilesystem);
-$VERSION = sprintf "%d.%03d", q$Revision: 1.5 $ =~ /: (\d+)\.(\d+)/;
+our $VERSION = '1.040';
+
+use vars qw($HaveCache $HaveLWP $HaveFilesystem);
 
 $HaveCache = 0;
 eval {
@@ -43,13 +44,13 @@ sub new {
 	#Do some sanity checking of inputs
 	my $resolver = $args->{resolver};
 	if(defined $resolver) {
-		confess "resolver must be an object" unless ( UNIVERSAL::isa($resolver,'UNIVERSAL') );
+		confess "resolver must be an object" unless Scalar::Util::blessed($resolver);
 		confess "resolver does not seem to use the expected interface (get_resource)" unless ($resolver->can('get_resource'));
 	}
 
 	my $object_cache = $args->{'object_cache'};
 	if(defined $object_cache ) {
-		confess "object_cache must be an object" unless ( UNIVERSAL::isa($object_cache,'UNIVERSAL') );
+		confess "object_cache must be an object" unless Scalar::Util::blessed($object_cache);
 		confess "object_cache does not seem to use the expected cache interface (get and set methods)" 
 			unless ($object_cache->can('get') && $object_cache->can('set'));
 		warn("Caching support is not available - object_cache will not be used") unless($HaveCache);
@@ -136,13 +137,10 @@ This is used by Email::MIME::CreateHTML to load resources.
 
 =back
 
-=head1 VERSION
-
-$Revision: 1.5 $ on $Date: 2006/08/24 21:41:38 $ by $Author: johna $
-
 =head1 AUTHOR
 
-Tony Hennessy, Simon Flack and John Alden
+Tony Hennessy, Simon Flack and John Alden with additional contributions by
+Ricardo Signes <rjbs@cpan.org> and Henry Van Styn <vanstyn@cpan.org>
 
 =head1 COPYRIGHT
 
